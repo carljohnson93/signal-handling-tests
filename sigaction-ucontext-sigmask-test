@@ -1,0 +1,20 @@
+#!/bin/sh
+{
+  echo '/*************************************************/'
+  echo '#include <signal.h>'
+  echo
+  echo 'int main(void) {'
+  echo '  ucontext_t uctx = {0};'
+  echo '  /*'
+  echo '   * On OpenBSD ucontext_t is an alias for sigcontext structure and it isn'"'"'t'
+  echo '   * POSIX conformant, it has a different field for signal mask.'
+  echo '   */'
+  echo '#ifdef __OpenBSD__'
+  echo '  sigset_t mask = uctx.sc_mask;'
+  echo '#else'
+  echo '  sigset_t mask = uctx.uc_sigmask;'
+  echo '#endif'
+  echo '  return sigemptyset(&mask); /* use `mask` to avoid "unused" warning */'
+  echo '}'
+  echo '/*************************************************/'
+} | tee /dev/tty | cc -xc - -o /dev/null
