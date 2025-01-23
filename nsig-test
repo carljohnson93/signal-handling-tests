@@ -26,4 +26,4 @@ __temp="$(mktemp)"
   echo '  puts("");'
   echo '}'
   echo '/*************************************************/'
-} | tee /dev/tty | cc -xc - -o "$__temp" && "$__temp" && rm "$__temp"
+} | tee /dev/tty | cc -xc - -o "$__temp" && "$__temp"; rm "$__temp"
