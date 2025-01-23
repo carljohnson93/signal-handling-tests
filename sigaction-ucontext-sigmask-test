@@ -17,4 +17,4 @@
   echo '  return sigemptyset(&mask); /* use `mask` to avoid "unused" warning */'
   echo '}'
   echo '/*************************************************/'
-} | tee /dev/tty | cc -xc - -o /dev/null
+} | tee /dev/stderr | cc -xc - -o /dev/null
