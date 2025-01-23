@@ -1,31 +1,36 @@
 #!/bin/sh
-__temp="$(mktemp)"
-{
-  echo '/*************************************************/'
-  echo '#include <stdio.h>'
-  echo '#include <signal.h>'
-  echo
-  echo 'int main(void) {'
-  echo '/* On FreeBSD NSIG does not account for real-time signals */'
-  echo '#ifdef __FreeBSD__'
-  echo '# ifdef _SIG_MAXSIG'
-  echo '  printf("_SIG_MAXSIG+1 %d", _SIG_MAXSIG + 1);'
-  echo '# else'
-  echo '#  error "Expected _SIG_MAXSIG to be defined on FreeBSD"'
-  echo '# endif'
-  echo '#elif defined(_NSIG)'
-  echo '  printf("_NSIG %d", _NSIG);'
-  echo '#elif defined(NSIG)'
-  echo '  printf("NSIG %d", NSIG);'
-  echo '#elif defined(_SIGMAX)'
-  echo '  printf("_SIGMAX+1 %d", _SIGMAX + 1);'
-  echo '#elif defined(SIGMAX)'
-  echo '  printf("SIGMAX+1 %d", SIGMAX+1);'
-  echo '#else'
-  echo '  printf("(sizeof(sigset_t)*8+1) %zd", sizeof(sigset_t) * 8 + 1);'
-  echo '#endif'
-  echo '  puts("");'
-  echo '}'
-  echo '/*************************************************/'
-} | tee /dev/tty | cc -xc - -o "$__temp" && "$__temp"
-rm "$__temp"
+__impl() {
+  __temp="$(mktemp)"
+  {
+    echo '/*************************************************/'
+    echo '#include <stdio.h>'
+    echo '#include <signal.h>'
+    echo
+    echo 'int main(void) {'
+    echo '/* On FreeBSD NSIG does not account for real-time signals */'
+    echo '#ifdef __FreeBSD__'
+    echo '# ifdef _SIG_MAXSIG'
+    echo '  printf("_SIG_MAXSIG+1 %d", _SIG_MAXSIG + 1);'
+    echo '# else'
+    echo '#  error "Expected _SIG_MAXSIG to be defined on FreeBSD"'
+    echo '# endif'
+    echo '#elif defined(_NSIG)'
+    echo '  printf("_NSIG %d", _NSIG);'
+    echo '#elif defined(NSIG)'
+    echo '  printf("NSIG %d", NSIG);'
+    echo '#elif defined(_SIGMAX)'
+    echo '  printf("_SIGMAX+1 %d", _SIGMAX + 1);'
+    echo '#elif defined(SIGMAX)'
+    echo '  printf("SIGMAX+1 %d", SIGMAX+1);'
+    echo '#else'
+    echo '  printf("(sizeof(sigset_t)*8+1) %zd", sizeof(sigset_t) * 8 + 1);'
+    echo '#endif'
+    echo '  puts("");'
+    echo '}'
+    echo '/*************************************************/'
+  } | tee /dev/stderr | cc -xc - -o "$__temp" && "$__temp"
+  err=$?
+  rm "$__temp"
+  return $err
+}
+__impl
