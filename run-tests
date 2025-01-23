@@ -1,0 +1,26 @@
+#!/bin/sh
+__impl() {
+  testdir="$(dirname "$(realpath "$0")")"
+  [ $? != 0 ] && return 1
+  testsuite_result=0
+  __testres="$(mktemp)"
+  [ $? != 0 ] && return 1
+  for test in nsig sigaction-ucontext-sigmask; do
+    echo "[${test}-test]"
+    { "${testdir}/${test}-test" 2>/dev/null; printf "$?" >"$__testres"; } | sed 's/^/> /'
+    if [ "$(cat "$__testres")" = 0 ]; then
+      [ -t 1 ] && printf "\033[32m"
+      echo Success
+      [ -t 1 ] && printf "\033[0m"
+    else
+      [ -t 1 ] && printf "\033[31m"
+      echo Failure
+      [ -t 1 ] && printf "\033[0m"
+      testsuite_result=1
+    fi
+    echo
+  done
+  rm "$__testres"
+  return "$testsuite_result"
+}
+__impl
