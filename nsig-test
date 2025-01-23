@@ -4,7 +4,8 @@ __temp="$(mktemp)"
   echo '/*************************************************/'
   echo '#include <stdio.h>'
   echo '#include <signal.h>'
-  echo 'int main() {'
+  echo
+  echo 'int main(void) {'
   echo '/* On FreeBSD NSIG does not account for real-time signals */'
   echo '#ifdef __FreeBSD__'
   echo '# ifdef _SIG_MAXSIG'
@@ -26,4 +27,5 @@ __temp="$(mktemp)"
   echo '  puts("");'
   echo '}'
   echo '/*************************************************/'
-} | tee /dev/tty | cc -xc - -o "$__temp" && "$__temp"; rm "$__temp"
+} | tee /dev/tty | cc -xc - -o "$__temp" && "$__temp"
+rm "$__temp"
